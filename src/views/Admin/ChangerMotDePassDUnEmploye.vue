@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 export default {
     data(){
         return{
-
+            choix:'ad',
             employees:null,
             idE:null,
             showPass:true,
@@ -22,6 +22,24 @@ export default {
         //     this.showPass=!this.showPass
         // }
         // ,
+      findEmpClass(){
+        return{
+          'fw-bolder text-dark': this.choix === 'emp',
+          '': this.choix !== 'emp',
+        }
+      },
+      findAdClass(){
+        return{
+          'fw-bolder text-dark': this.choix === 'ad',
+          '': this.choix !== 'ad',
+        }
+      },
+      switchToEmp(){
+        this.choix='emp'
+      },
+      switchToAd(){
+        this.choix='ad'
+      },
         showSuccessMessage(message,callbackFunction) {
             Swal.fire({
                 icon: 'success',
@@ -109,7 +127,16 @@ export default {
 
 <template>
     <div class="container-fluid mt-lg-5">
-
+        <div class="row">
+          <div :class="findAdClass()" @click="switchToAd" class="col-md-3 offset-3 cursor-pointer">
+            <span >Changer votre mot de pass</span>
+          </div>
+          <div :class="findEmpClass()" class="col-md-3 cursor-pointer" @click="switchToEmp">
+            <span >
+            Changer le mot de pass d'un enployé
+            </span>
+          </div>
+        </div>
         <div class="row">
 
 
@@ -131,7 +158,7 @@ export default {
 
 <!--            </div>-->
 
-            <div class="formbold-main-wrapper">
+            <div class="formbold-main-wrapper" v-if="choix==='emp'">
                 <div class="formbold-form-wrapper">
                             <div class="formbold-steps">
                             <h2 class="text-center">Changer le mot de pass</h2>
@@ -145,9 +172,14 @@ export default {
 
                     <label  class="formbold-form-label">Entrer le nouveau mot de pass :</label>
                     <input class="mb-2 w-100 formbold-form-input" type="password" v-model="newPass">
-                    <div class="w-25 m-auto">
-                        <span class="formbold-btn" @click="changerPass">Confirmer</span>
-                    </div>
+<!--                    <div class="w-25 m-auto">-->
+<!--                        <span class="formbold-btn" >Confirmer</span>-->
+<!--                    </div>-->
+                  <div class="formbold-form-btn-wrapper"><span class="text-danger fw-bolder">{{ error }}</span>
+                    <span @click="changerPass" class="formbold-btn">
+                                Confirmer
+                            </span>
+                  </div>
                 </div>
             </div>
 
@@ -155,9 +187,9 @@ export default {
 
 
         </div>
-        <div v-if="this.$store.state.darkMode" class="row w-100 Whitekhett"></div>
-        <div v-if="!this.$store.state.darkMode" class="row w-100 Blackkhett"></div>
-        <div class="row">
+<!--        <div v-if="this.$store.state.darkMode" class="row w-100 Whitekhett"></div>-->
+<!--        <div v-if="!this.$store.state.darkMode" class="row w-100 Blackkhett"></div>-->
+        <div class="row" v-if="choix==='ad'">
 
 <!--                <div>-->
 <!--                Changer votre mot de pass-->
@@ -416,6 +448,8 @@ body {
     height: 1px;
     background-color: black;
 }
-
+.bg-griyya{
+  background-color: grey;
+}
 
 </style>

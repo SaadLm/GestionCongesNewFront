@@ -1,0 +1,643 @@
+<script>
+import axios from "axios"
+import moment from 'moment';
+import Swal from 'sweetalert2';
+import FlatPickr from 'vue-flatpickr-component';
+export default {
+    components: {
+        flatPickr: FlatPickr,
+    },
+    data(){
+        return{
+            showAjouter:false,
+            showModifier:false,
+            employees:[],
+            employeData:{
+              nom:null,
+              prenom:null,
+              status:null,
+              tel:null,
+              email:null,
+              pass:null,
+              adresse:null,
+              dateRecrutement:null,
+              cin:null,
+              typeContrat:null,
+              cnss:null
+          },
+            typeContrat: null,
+            err:null,
+            errModifier:null,
+            isDateValid: true,
+            currentPage: 1,
+            totalPages: 1,
+            datePickerConfig: {
+                dateFormat: 'd/m/Y', // Format for display
+            },
+
+        }
+    },
+    methods:{
+        ajouterEmploye(){
+            // console.log("----------------------------")
+            // console.log(this.employeData.nom)
+            // console.log(this.employeData.prenom)
+            // console.log(this.employeData.status)
+            // console.log(this.employeData.tel)
+            // console.log(this.employeData.email)
+            // console.log(this.employeData.pass)
+            // console.log(this.employeData.adresse)
+            // console.log(this.employeData.typeContrat)
+            // console.log(this.employeData.dateRecrutement)
+            // console.log(this.employeData.cin)
+            // console.log(this.employeData.cnss)
+            // console.log(this.employeData.tel)
+            // console.log("----------------------------")
+
+
+
+
+            if (this.employeData.nom == null ||
+                this.employeData.prenom == null ||
+                this.employeData.status == null ||
+                this.employeData.tel == null ||
+                this.employeData.adresse == null ||
+                this.employeData.typeContrat == null ||
+                this.employeData.dateRecrutement == null ||
+                this.employeData.cin == null ||
+                this.employeData.cnss == null
+                )
+            {
+                this.err = 'Merci de remplir les champs';
+                console.log(this.err)
+            }
+
+            else {
+
+                // const dateRecrutement = moment(this.employeData.dateRecrutement, 'DD/MM/YYYY');
+                // const formattedDateRecrutement = dateRecrutement.format('YYYY-MM-DD');
+                // this.employeData.dateRecrutement=formattedDateRecrutement
+                // console.log(this.employeData.dateRecrutement)
+                fetch('http://localhost:3000/employe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.employeData)
+            }).then(response =>{
+                    if (response.ok) {
+                        this.fetchData()
+                        this.showSuccessMessage('employé ajouté avec succés')
+                        return response.json();
+                    } else {
+                        this.showErrorMessage('Email deja enregistré !')
+                        console.log('Failed to create employe');
+                        throw new Error('Failed to create employe')
+                    }
+                }
+            )
+
+            }
+
+
+
+
+        },
+        showSuccessMessage(message) {
+            this.showAjouter=false
+            this.showModifier=false
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: message,
+                confirmButtonText: 'OK',
+            });
+        },
+        showErrorMessage(message){
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: message,
+            });
+        },
+        modifierEmploye(){
+
+
+            if (this.employeData.nom == null ||
+                this.employeData.prenom == null ||
+                this.employeData.status == null ||
+                this.employeData.tel == null ||
+                this.employeData.email == null ||
+                this.employeData.pass === '' ||
+                this.employeData.adresse == null ||
+                this.employeData.typeContrat == 0 ||
+                this.employeData.dateRecrutement == null ||
+                this.employeData.cin == null ||
+                this.employeData.cnss == null
+            )
+            {
+                this.errModifier = 'Merci de remplir les champs';
+                console.log(this.errModifier)
+            }
+            else {
+                // console.log(this.employeData.dateRecrutement)
+                axios.put('http://localhost:3000/editemploye',this.employeData)
+                    .then(response=>{
+                        console.log('employé modifier avec succés')
+                        this.fetchData()
+                        this.showSuccessMessage('employé modifier avec succés')
+                        console.log(response.data.message)
+
+                    }
+                    )
+                    .catch(error=>{
+                        console.log("employé n'a pas modifier , ", error);
+
+
+                    }
+                    )
+
+                  }
+        },
+        localString(d){
+            const formattedDate = moment(d).format('YYYY-MM-DD');
+            return formattedDate;
+        },
+        handleChange() {
+            // Update the data-date attribute using moment.js
+            this.$el.querySelector('input').setAttribute(
+                'data-date',
+                moment(this.employeData.dateRecrutement, 'YYYY-MM-DD').format('YYYY-MM-DD')
+            );
+        },
+
+
+
+
+
+        changeAjouter(){
+            this.showAjouter=!this.showAjouter
+            this.err=''
+        },
+        changeModifier(emp){
+            this.employeData=emp
+            this.errModifier=''
+            this.employeData.pass=''
+            this.showModifier=!this.showModifier
+
+        },
+        typeCont(type){
+                    // console.log(typeof(type))
+            const a =  parseInt(type)
+            switch (a) {
+                case 1:
+                    return 'CDI';
+                case 2:
+                    return 'CDD';
+                case 3:
+                    return 'CTT';
+            }
+        },
+        fetchEmployes(){
+            axios.get('http://localhost:3000/employe')
+                .then(response => {
+                    // console.log(response.data);
+                    this.employees = response.data;
+
+                })
+                .catch(error => {
+                    console.error('Error fetching les employees:', error);
+                    // Handle the error
+                });
+        },
+        async fetchData() {
+            try {
+                const obj = {page: this.currentPage}
+                const response = await axios.post(`http://localhost:3000/employepage`, obj);
+                const data = response.data;
+                console.log("hada total : ", data.total)
+                // Assuming the total count is sent from the server
+                this.totalPages = Math.ceil(data.total / 10);
+                // console.log('totalPages = ',this.totalPages)
+                this.employees = data.res;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        prevPage() {
+            if (this.currentPage >= 2) {
+                console.log('prev')
+                this.currentPage -= 1;
+                console.log(this.currentPage)
+                this.fetchData();
+            }
+        },
+        nextPage() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage += 1;
+                console.log(this.currentPage)
+                this.fetchData();
+            }
+
+        },
+    },
+    mounted() {
+        axios.get('http://localhost:3000/typecontrat')
+            .then(response=>{
+                this.typeContrat=response.data
+                // console.log(this.typeContrat)
+            })
+            .catch(error=>{
+                console.error('error feching les type de contrats',error)
+            })
+        // this.fetchEmployes()
+        this.fetchData()
+
+    }
+}
+</script>
+
+<template>
+    <div v-if="showAjouter" class="container-fluid position-absolute showAjouter">
+    <div class="row">
+        <div class=" innerCard col-md-5 col-lg-9 col-xl-7 offset-1">
+            <div class="card shadow-2-strong" style="border-radius: 10px;">
+                <div class="card-body p-4 p-md-5">
+                    <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Forme d'ajoutement d'un employé</h3>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.nom" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" >Nom :</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.prenom" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">Prenom :</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <select class="form-select form-select-lg mb-3" v-model="employeData.status">
+                                        <option value="Actif">Actif</option>
+                                        <option value="inactif">Inactif</option>
+                                    </select>
+                                    <label class="form-label" >Status :</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.tel" type="tel" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">Telephone :</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.email" type="text"  class="form-control form-control-lg" />
+                                    <label class="form-label" >Email :</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.pass" type="password"  class="form-control form-control-lg" />
+                                    <label class="form-label" >Mote de passe :</label>
+                                </div>
+                            </div>
+                        </div><div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.adresse" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">adresse :</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <select  class="form-select form-select-lg mb-3" v-model="employeData.typeContrat">
+                                        <option v-for="type in typeContrat" :key="type.id_contrat" :value="type.id_contrat">{{ type.nom }}</option>
+
+                                    </select>
+                                    <label class="form-label" >Type de contrat</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+<!--                                    <input v-model="employeData.dateRecrutement" type="date" data-date="" data-date-format="DD MMMM YYYY" @input="handleChange" class="form-control form-control-lg" />-->
+                                    <flat-pickr
+
+                                        v-model="employeData.dateRecrutement"
+                                        :config="DatePickerConfig"
+                                        class="form-control form-control-sm"
+                                    ></flat-pickr>
+                                    <label class="form-label" >Date de recrutement :</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.cin" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">CIN :</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-6 offset-3 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.cnss" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">Numero CNSS :</label>
+                                </div>
+                            </div>
+                        </div>
+                    <span class="text-danger fw-bolder">{{err}}</span>
+
+                    <div class="row w-100">
+                        <div class="col-md-9 offset-3 p-1 ">
+                            <button @click="ajouterEmploye" class="btn btn-primary">Ajouter</button>
+                            <button @click="changeAjouter" class="btn btn-warning ms-1">Back</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div v-if="showModifier" class="container-fluid position-absolute showAjouter">
+    <div class="row">
+        <div class=" innerCard col-md-5 col-lg-9 col-xl-7 offset-1">
+            <div class="card bg-gradient shadow-2-strong" style="border-radius: 10px;">
+                <div class="card-body p-4 p-md-5">
+                    <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Forme de modification d'un employé</h3>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.nom" type="text"  class="form-control form-control-lg" />
+                                    <label class="form-label" >Nom :</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.prenom" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">Prenom :</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <select class="form-select form-select-lg mb-3" v-model="employeData.status">
+                                        <option value="Actif">Actif</option>
+                                        <option value="inactif">Inactif</option>
+                                    </select>
+                                    <label class="form-label" >Status :</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.tel" type="tel" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">Telephone :</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.email" type="text"  class="form-control form-control-lg" />
+                                    <label class="form-label" >Email :</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.pass" type="password"  class="form-control form-control-lg" />
+                                    <label class="form-label" >Mote de passe :</label>
+                                </div>
+                            </div>
+                        </div><div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.adresse" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">adresse :</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <select  class="form-select form-select-lg mb-3" v-model="employeData.typeContrat">
+                                        <option v-for="type in typeContrat"
+                                                :key="type.id_contrat"
+                                                :value="type.id_contrat">{{ type.nom }}
+                                        </option>
+
+                                    </select>
+                                    <label class="form-label" >Type de contrat</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+<!--                                    <input v-model="employeData.dateRecrutement" type="date" data-date="" data-date-format="DD MMMM YYYY" @input="handleChange" class="form-control form-control-lg" />-->
+                                    <flat-pickr
+
+                                        v-model="employeData.dateRecrutement"
+                                        class="form-control form-control-sm"
+                                    ></flat-pickr>
+                                    <label class="form-label" >Date de recrutement :</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.cin" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">CIN :</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-6 offset-3 mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.cnss" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" for="login">Numero CNSS :</label>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-danger fw-bolder">{{errModifier}}</span>
+                        <div class="row w-100">
+                            <div class="col-md-10 offset-3 p-1 ">
+                                <button @click="modifierEmploye" class="btn btn-primary ">Modifier</button>
+                                <button @click="changeModifier" class="btn btn-warning ms-1 ">Back</button>
+                            </div>
+                        </div>
+<!--                        <div class="mt-4 pt-2">-->
+<!--                        </div>-->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="container-fluid">
+
+    <div class="row w-100 mt-5 me-2">
+        <div class="col-md-9">
+
+            <h2>Les employées :</h2>
+            <span class="formbold-btn btn z0" @click="changeAjouter">Ajouter</span>
+
+            <table class="table table-rounded table-flush mt-5">
+
+                <thead>
+                <tr class="fw-bolder text-danger border-bottom border-gray-200">
+                    <th>Nom :</th>
+                    <th>Prenom :</th>
+                    <th>Status :</th>
+                    <th>Téléphone :</th>
+                    <th>Email :</th>
+                    <th>Adresse :</th>
+                    <th>Date de recrutement :</th>
+                    <th>N° CIN :</th>
+                    <th>Type de contrat :</th>
+                    <th>N° CNSS :</th>
+                </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="emp in employees" :key="emp.id_e">
+                    <td>{{ emp.nom }}</td>
+                    <td>{{ emp.prenom }}</td>
+                    <td>{{ emp.status }} </td>
+                    <td>{{ emp.tel }} </td>
+                    <td>{{ emp.email }} </td>
+                    <td>{{ emp.adresse }} </td>
+                    <td>{{ localString(emp.dateRecrutement) }} </td>
+                    <td>{{ emp.cin }} </td>
+                    <td>{{ typeCont(emp.typeContrat) }} </td>
+                    <td>{{ emp.cnss }} </td>
+                    <td><span @click="changeModifier(emp)" class="formbold-btn">Modifier</span> </td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--    <div class="container-fluid fixed-bottom position-absolute">-->
+  <div class="position-fixed fixed-bottom w-100">
+    <div class="container-fluid">
+      <div class="row">
+            <div class="col-md-5 offset-md-5 col-sm-10 offset-sm-1">
+                <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square"></i>Previous</button>
+                <span>Page {{ currentPage }}</span>
+                <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages"><i class="bi bi-arrow-right-square"></i>Next</button>
+            </div>
+          </div>
+      </div>
+    </div>
+
+</template>
+
+<style scoped>
+body{
+    background-color: white;
+}
+.showAjouter{
+
+    top: 10%;
+    margin: auto;
+}
+.innerCard{
+    width:100ch
+}
+
+.formbold-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 10px 25px;
+    border: none;
+    font-weight: 500;
+    background-color: #6A64F1;
+    color: white;
+    cursor: pointer;
+}
+.formbold-btn:hover {
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
+}
+.btn{
+    width: 20vh;
+}
+.z0{
+  z-index: 0;
+}
+
+</style>
+<!-- <template>
+  <div class="py-4 container-fluid">
+    <div class=" row">
+      <div class="col-12">
+        <authors-table />
+      </div>
+    </div>
+    <div class="mt-4 row">
+      <div class="col-12">
+        <projects-table />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import AuthorsTable from "./components/AuthorsTable.vue";
+import ProjectsTable from "./components/ProjectsTable.vue";
+
+export default {
+  name: "tables",
+  components: {
+    AuthorsTable,
+    ProjectsTable
+  },
+  data() {
+    return {
+      stats: {
+        titleColor: "opacity-7 text-white",
+        descColor: "text-white",
+        trip: {
+          title: "Today's Trip",
+          desc: "145 KM",
+          classIcon: "text-dark ni ni-money-coins",
+        },
+        health: {
+          title: "Battery Health",
+          desc: "99 %",
+          classIcon: "text-dark ni ni-controller ",
+        },
+        speed: {
+          title: "Average Speed",
+          desc: "56 Km/h",
+          classIcon: "text-dark ni ni-delivery-fast",
+        },
+        volume: {
+          title: "Music Volume",
+          desc: "15/100",
+          classIcon: "text-dark ni ni-note-03",
+        },
+      },
+    };
+  },
+};
+</script> -->

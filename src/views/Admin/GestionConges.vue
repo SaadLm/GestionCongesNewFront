@@ -282,7 +282,8 @@ export default {
         </tr>
         </tbody>
     </table>
-    <div class="container-fluid fixed-bottom">
+<!--    <div class="container-fluid fixed-bottom">-->
+    <div class="container-fluid">
         <div class="row">
             <div class="col-md-4 offset-5">
                 <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square me-2"></i>Previous</button>

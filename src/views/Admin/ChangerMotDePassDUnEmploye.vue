@@ -126,12 +126,12 @@ export default {
 </script>
 
 <template>
-    <div class="container-fluid mt-lg-5">
-        <div class="row">
-          <div :class="findAdClass()" @click="switchToAd" class="col-md-3 offset-3 cursor-pointer">
+    <div class="container-fluid mt-lg-5 mt-sm-2">
+        <div class="row ">
+          <div :class="findAdClass()" @click="switchToAd" class="col-md-3 offset-md-3 col-sm-12 cursor-pointer">
             <span >Changer votre mot de pass</span>
           </div>
-          <div :class="findEmpClass()" class="col-md-3 cursor-pointer" @click="switchToEmp">
+          <div :class="findEmpClass()" class="col-md-3 col-sm-12 cursor-pointer" @click="switchToEmp">
             <span >
             Changer le mot de pass d'un enployé
             </span>
@@ -164,13 +164,13 @@ export default {
                             <h2 class="text-center">Changer le mot de pass</h2>
                             <h4 class="text-center">d'un employe</h4>
                             </div>
-                    <label class="formbold-form-label">selectioner l'employé ! :</label>
+                    <label class="formbold-form-label">Selectioner l'employé ! :</label>
                     <select v-model="idE" class="form-select">
                         <option disabled selected >selectioner !</option>
                         <option :value="emp.id_e" :key="emp.id_e" v-for="emp in employees">{{ emp.nom }} {{ emp.prenom}}</option>
                     </select>
 
-                    <label  class="formbold-form-label">Entrer le nouveau mot de pass :</label>
+                    <label  class="formbold-form-label mt-3">Entrer le nouveau mot de pass :</label>
                     <input class="mb-2 w-100 formbold-form-input" type="password" v-model="newPass">
 <!--                    <div class="w-25 m-auto">-->
 <!--                        <span class="formbold-btn" >Confirmer</span>-->
@@ -212,22 +212,25 @@ export default {
                                         class="formbold-form-input"
                                 />
                             </div>
-                            <div class="formbold-input-flex mt-5">
-                                <div>
-                                    <label  class="formbold-form-label"> Nouveau mot de pass :</label>
-                                    <input v-model="newPassAd"
-                                           type="password"
-                                           class="formbold-form-input"
-                                    />
-                                </div>
-                                <div>
-                                    <label class="formbold-form-label"> Confirmer nouveau mot de pass : </label>
-                                    <input  v-model="confirmationAd"
-                                            type="password"
-                                            class="formbold-form-input"
-                                    />
-                                </div>
+<!--                            <div class="formbold-input-flex mt-5">-->
+                          <div class="row mt-3">
+                            <div class="col-sm-12 col-md-6">
+                              <label  class="formbold-form-label"> Nouveau mot de pass :</label>
+                              <input v-model="newPassAd"
+                                     type="password"
+                                     class="formbold-form-input"
+                              />
                             </div>
+                            <div class="col-sm-12 col-md-6">
+                              <label class="formbold-form-label"> Confirmer nouveau mot de pass : </label>
+                              <input  v-model="confirmationAd"
+                                      type="password"
+                                      class="formbold-form-input"
+                              />
+                            </div>
+                          </div>
+
+<!--                            </div>-->
 
                         </div>
 

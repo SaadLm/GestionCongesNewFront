@@ -142,7 +142,7 @@ export default {
     },
     mounted() {
         // const id_emp=this.employe.id_e
-        this.getData()
+        // this.getData()
         this.fetchData()
         if(this.$store.state.darkMode){
             console.log('K7ell')
@@ -167,7 +167,7 @@ export default {
     <div v-if="showRaison" class="container-fluid position-absolute showRaison w-50  h-25">
         <span>{{this.raisonPourChaqueDemande}} awdjliawjdliawd</span>
     </div>
-    <table class="table table-rounded mt-5 table-flush m-auto">
+    <table class="table table-rounded mt-5 table-flush w-50" >
 
         <thead>
         <tr class="fw-bold fs-7 text-danger border-bottom border-gray-200 py-4 text-primary">
@@ -181,7 +181,7 @@ export default {
         </thead>
         <tbody class="fw-bold">
         <tr v-for="dem in demandes" :key="dem.id_co">
-            <td>{{ localString(dem.dateAc) }}</td>
+            <td><span class="p-4">{{ localString(dem.dateAc) }}</span></td>
             <td>{{localString(dem.dateDebut) }}</td>
             <td>{{localString(dem.dateFin) }} </td>
             <td>{{ dem.motif }} </td>
@@ -197,9 +197,9 @@ export default {
         </tbody>
     </table>
 
-    <div class="container-fluid fixed-bottom">
+    <div class="container-fluid ">
         <div class="row">
-            <div class="col-md-4 offset-5">
+            <div class="col-md-4 offset-3">
                 <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square me-2"></i>Previous</button>
                 <span class="m-1">Page {{ currentPage }}</span>
                 <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages">Next<i class="bi bi-arrow-right-square ms-3"></i></button>

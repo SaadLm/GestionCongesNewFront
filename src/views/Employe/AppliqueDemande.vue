@@ -217,7 +217,7 @@ export default {
 <template>
     <div class="container-fluid mt-5">
         <div class="row">
-            <div class="col-md-2 col-sm-8 mt-5 ms-5 ms-sm-1 me-5">
+            <div class="col-md-2 col-sm-8 mt-5 ms-sm-1 me-5">
                 <div class="card shadow-right-bottom">
                     <span class="text-primary fw-bolder ms-1">Congés resté:</span> <br>
                     <span class="text-center fw-bolder">{{ nbr}} jours</span>

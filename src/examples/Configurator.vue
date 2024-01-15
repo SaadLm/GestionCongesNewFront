@@ -139,7 +139,11 @@
             class="mt-lte7t"
             @click="toggle"
             :class="this.$store.state.isRTL ? 'float-start' : 'float-end'"
-        ><span class="me-4 text-dark fw-bolder cursor-pointer hover-movement">Fermer</span>
+        >
+<!--          <span class="me-4 text-dark fw-bolder cursor-pointer hover-movement">Fermer</span>-->
+          <span v-if="this.$store.state.darkMode" class="me-4 text-white fw-bolder cursor-pointer hover-movement">Fermer</span>
+
+          <span v-if="!this.$store.state.darkMode" class="me-4 text-dark fw-bolder cursor-pointer hover-movement">Fermer</span>
 <!--          <button class="p-0 btn btn-link text-dark fixed-plugin-close-button">-->
 <!--            <i class="fa fa-close"></i>-->
 <!--          </button>-->

@@ -94,22 +94,24 @@ export default {
                             class="formbold-form-input"
                     />
                 </div>
-                <div class="formbold-input-flex mt-5">
-                    <div>
+<!--                <div class="formbold-input-flex mt-5">-->
+              <div class="row mt-3">
+                    <div class="col-sm-12 col-md-6">
                         <label  class="formbold-form-label"> Nouveau mot de pass :</label>
                         <input v-model="newPass"
                                type="password"
                                class="formbold-form-input"
                         />
                     </div>
-                    <div>
+                    <div class="col-sm-12 col-md-6">
                         <label class="formbold-form-label"> Confirmer nouveau mot de pass : </label>
                         <input  v-model="confirmation"
                                 type="password"
                                 class="formbold-form-input"
                         />
                     </div>
-                </div>
+              </div>
+<!--                </div>-->
 
             </div>
 

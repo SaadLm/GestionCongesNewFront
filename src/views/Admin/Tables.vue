@@ -128,7 +128,7 @@ export default {
                 this.employeData.status == null ||
                 this.employeData.tel == null ||
                 this.employeData.email == null ||
-                this.employeData.pass === '' ||
+                // this.employeData.pass === '' ||
                 this.employeData.adresse == null ||
                 this.employeData.typeContrat == 0 ||
                 this.employeData.dateRecrutement == null ||
@@ -176,8 +176,22 @@ export default {
 
 
         changeAjouter(){
-            this.showAjouter=!this.showAjouter
+            this.showAjouter=!this.showAjouter,
             this.err=''
+            this.employeData={
+                nom:null,
+                prenom:null,
+                status:null,
+                tel:null,
+                email:null,
+                pass:null,
+                adresse:null,
+                dateRecrutement:null,
+                cin:null,
+                typeContrat:null,
+                cnss:null
+          }
+
         },
         changeModifier(emp){
             this.employeData=emp
@@ -260,7 +274,7 @@ export default {
 <template>
     <div v-if="showAjouter" class="container-fluid position-absolute showAjouter">
     <div class="row">
-        <div class=" innerCard col-md-5 col-lg-9 col-xl-7 offset-1">
+        <div class=" innerCard col-md-5 col-lg-9 col-xl-7 offset-md-1">
             <div class="card shadow-2-strong" style="border-radius: 10px;">
                 <div class="card-body p-4 p-md-5">
                     <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Forme d'ajoutement d'un employé</h3>
@@ -349,7 +363,7 @@ export default {
                         </div>
                         <div class="row">
 
-                            <div class="col-md-6 offset-3 mb-4">
+                            <div class="col-md-6 offset-md-3 mb-4">
                                 <div class="form-outline">
                                     <input v-model="employeData.cnss" type="text" class="form-control form-control-lg" />
                                     <label class="form-label" for="login">Numero CNSS :</label>
@@ -361,7 +375,7 @@ export default {
                     <div class="row w-100">
                         <div class="col-md-9 offset-3 p-1 ">
                             <button @click="ajouterEmploye" class="btn btn-primary">Ajouter</button>
-                            <button @click="changeAjouter" class="btn btn-warning ms-1">Back</button>
+                            <button @click="changeAjouter" class="btn btn-warning ms-md-1">Back</button>
                         </div>
                     </div>
 
@@ -372,7 +386,7 @@ export default {
 </div>
     <div v-if="showModifier" class="container-fluid position-absolute showAjouter">
     <div class="row">
-        <div class=" innerCard col-md-5 col-lg-9 col-xl-7 offset-1">
+        <div class=" innerCard col-md-5 col-lg-9 col-xl-7 offset-md-1">
             <div class="card bg-gradient shadow-2-strong" style="border-radius: 10px;">
                 <div class="card-body p-4 p-md-5">
                     <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Forme de modification d'un employé</h3>
@@ -463,7 +477,7 @@ export default {
                         </div>
                         <div class="row">
 
-                            <div class="col-md-6 offset-3 mb-4">
+                            <div class="col-md-6 offset-md-3 mb-4">
                                 <div class="form-outline">
                                     <input v-model="employeData.cnss" type="text" class="form-control form-control-lg" />
                                     <label class="form-label" for="login">Numero CNSS :</label>
@@ -474,7 +488,7 @@ export default {
                         <div class="row w-100">
                             <div class="col-md-10 offset-3 p-1 ">
                                 <button @click="modifierEmploye" class="btn btn-primary ">Modifier</button>
-                                <button @click="changeModifier" class="btn btn-warning ms-1 ">Back</button>
+                                <button @click="changeModifier" class="btn btn-warning ms-md-1 ">Back</button>
                             </div>
                         </div>
 <!--                        <div class="mt-4 pt-2">-->
@@ -534,11 +548,12 @@ export default {
     </div>
 </div>
 
-<!--    <div class="container-fluid fixed-bottom position-absolute">-->
-  <div class="position-fixed fixed-bottom w-100">
+]
+<!--  <div class="position-fixed fixed-bottom w-100">-->
+  <div class="position-fixed w-100" >
     <div class="container-fluid">
-      <div class="row">
-            <div class="col-md-5 offset-md-5 col-sm-10 offset-sm-1">
+      <div class="row" >
+            <div class="col-md-5 offset-md-5 col-sm-10 offset-sm-1" >
                 <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square"></i>Previous</button>
                 <span>Page {{ currentPage }}</span>
                 <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages"><i class="bi bi-arrow-right-square"></i>Next</button>

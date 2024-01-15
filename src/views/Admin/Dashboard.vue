@@ -69,12 +69,12 @@
                         <div class="p-3 pb-0 card-header">
                           <div class="d-flex justify-content-between">
                             <!--                                      <h6 class="mb-2">En attente de repondre :</h6> <router-link class="bg-gradient-success btn" to="gestionconges">Go !</router-link>-->
-                            <div class="container-fluid">
+                            <div class="container">
                               <div class="row">
-                                <div class="col-md-6 col-sm-8 offset-sm-3 offset-md-3">
+                                <div class="col-md-9 col-sm-12 offset-md-3">
                                   <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square me-2"></i>Previous</button>
-                                  <span class="m-1">Page {{ currentPage }}</span>
-                                  <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages">Next<i class="bi bi-arrow-right-square ms-3"></i></button>
+                                  <span >Page {{ currentPage }}</span>
+                                  <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages">Next<i class="bi bi-arrow-right-square ms-2"></i></button>
                                 </div>
                               </div>
                             </div>

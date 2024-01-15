@@ -224,12 +224,7 @@
         </sidenav-item>
       </li>
 
-          <h6
-                  class="text-xs ps-4 mt-3 text-uppercase font-weight-bolder opacity-6"
-                  :class="this.$store.state.isRTL ? 'me-4' : 'ms-2'"
-          >
-              Déconnexion
-          </h6>
+
 
       <li class="nav-item">
         <sidenav-item

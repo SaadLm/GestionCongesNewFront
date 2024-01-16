@@ -73,7 +73,7 @@
                               <div class="row">
                                 <div class="col-md-9 col-sm-12 offset-md-3">
                                   <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square me-2"></i>Previous</button>
-                                  <span >Page {{ currentPage }}</span>
+                                  <span class="pb-1">Page {{ currentPage }}</span>
                                   <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages">Next<i class="bi bi-arrow-right-square ms-2"></i></button>
                                 </div>
                               </div>

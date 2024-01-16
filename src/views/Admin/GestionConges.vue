@@ -13,7 +13,8 @@ export default {
             currentPage: 1,
             totalPages: 1,
           demPourRefuser:null,
-          solde:0
+          solde:0,
+          numberOfDays:0
         }
     },
     methods:{
@@ -88,9 +89,23 @@ export default {
           return null;
         }
       },
+      async getNumberOfDays(debut,fin) {
+        try {
+          const response = await axios.get('/calculate-days', {
+            params: {
+              dateDebut: debut, // Replace with your start date
+              dateFin: fin,   // Replace with your end date
+            },
+          });
 
-
-
+          // Assign the response to the data variable
+          this.numberOfDays = response.data.numberOfDays;
+          console.log('Number of days:', this.numberOfDays);
+        } catch (error) {
+          console.error('Error fetching number of days:', error);
+        }
+      }
+      ,
       async accepterConge(demande) {
         try {
           // Get the solde value using getSolde
@@ -101,12 +116,15 @@ export default {
 
           console.log('Le congé a été accepté');
           console.log(response.data);
-
+          this.getNumberOfDays(demande.dateDebut,demande.dateFin)
           // Construct the email message
           const messageEmail = {
+            objet:'Acceptation de votre demande de congé',
             to: response.data.employeeData.email,
-            message: `Votre congé de ${this.localString(demande.dateDebut)} à ${this.localString(demande.dateFin)}, a été approuvé !!
-                       Votre solde restant est : ${solde}`,
+            message: `Bonjour,
+            Nous sommes ravis de vous informer que votre demande de congé pour la période du ${this.localString(demande.dateDebut)} au ${this.localString(demande.dateFin)} a été acceptée.
+            Vous bénéficiez d'une durée de ${this.numberOfDays} jours de congé, et votre reliquat après cette demande est de ${solde} jours.
+            Cordialement.`,
           };
 
           // Send the email
@@ -160,7 +178,7 @@ export default {
           const demande ={
               id_co: id_co,
             raisonRefusion: raisonRefusion,
-            id_e:dem.id_e
+            id_e:dem.id_e,
           }
 
             axios.put('http://localhost:3000/refuserconge',demande)
@@ -168,11 +186,18 @@ export default {
                     console.log('Le congé a ete refusé',response)
                     this.showMotif=false
                   const messageEmail = {
+                    objet:'Réponse à votre demande de congé',
                     to : response.data.employeeData.email,
-                    message:`Votre congé de ${this.localString(demande.dateDebut)} à ${this.localString(demande.dateFin)}, a été refusé !!
-                        votre solde restant est : ${response.data.employeeData.soldeConge}`
+                    message:`Bonjour,
+                    Nous avons pris connaissance de votre demande de congé pour la période du ${this.localString(demande.dateDebut)} au ${this.localString(demande.dateFin)} . Après avoir examiné attentivement la situation actuelle de l'équipe et les impératifs opérationnels, nous regrettons de vous informer que votre demande de congé n'a pas été approuvée.
+                    Nous restons ouverts à la discussion et à l'exploration de solutions alternatives si vous avez des préoccupations ou des questions. Merci de votre compréhension.
+                    Cordialement.
+
+                    Motif : ${demande.raisonRefusion}
+                    `
                   }
                   this.sendEmail(messageEmail)
+                  this.fetchData()
                 })
                 .catch(error=>{
                         console.log(error , ' l operation a ete echoué' )
@@ -195,7 +220,7 @@ export default {
         sendEmail(cong) {
             const emailData = {
                 to: cong.to,
-                subject: 'Validation de congé',
+                subject: cong.objet,
                 text: cong.message
             };
 
@@ -257,7 +282,7 @@ export default {
 
         </div>
     </div>
-    <table class="table table-rounded mt-5 table-flush m-auto">
+    <table class="table table-rounded mt-5 table-flush w-75">
 
         <thead>
         <tr class="fw-bold fs-7 text-danger border-bottom border-gray-200 py-4 text-primary">
@@ -285,7 +310,7 @@ export default {
 <!--    <div class="container-fluid fixed-bottom">-->
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-4 offset-5">
+            <div class="col-md-4 offset-3">
                 <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square me-2"></i>Previous</button>
                 <span class="m-1">Page {{ currentPage }}</span>
                 <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages">Next<i class="bi bi-arrow-right-square ms-3"></i></button>

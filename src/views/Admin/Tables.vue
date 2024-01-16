@@ -272,7 +272,7 @@ export default {
 </script>
 
 <template>
-    <div v-if="showAjouter" class="container-fluid position-absolute showAjouter">
+    <div v-if="showAjouter" class="container-fluid position-absolute showAjouter" style="z-index: 10">
     <div class="row">
         <div class=" innerCard col-md-5 col-lg-9 col-xl-7 offset-md-1">
             <div class="card shadow-2-strong" style="border-radius: 10px;">
@@ -384,7 +384,7 @@ export default {
         </div>
     </div>
 </div>
-    <div v-if="showModifier" class="container-fluid position-absolute showAjouter">
+    <div v-if="showModifier" class="container-fluid position-absolute showAjouter" style="z-index: 10">
     <div class="row">
         <div class=" innerCard col-md-5 col-lg-9 col-xl-7 offset-md-1">
             <div class="card bg-gradient shadow-2-strong" style="border-radius: 10px;">
@@ -510,7 +510,7 @@ export default {
         <div class="col-md-9">
 
             <h2>Les employées :</h2>
-            <span class="formbold-btn btn z0" @click="changeAjouter">Ajouter</span>
+            <span class="formbold-btn btn z0" @click="changeAjouter" style="z-index: 0">Ajouter</span>
 
             <table class="table table-rounded table-flush mt-5">
 

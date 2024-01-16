@@ -6,14 +6,23 @@ import Swal from 'sweetalert2';
 // import html2canvas from 'html2canvas';
 // import html2pdf from 'html2pdf';
 import html2pdf from 'html2pdf.js';
-
+import PdfTemplate from "@/views/Employe/PdfTemplate.vue";
+// import Vue from 'vue';
 export default {
+  components: {
+    PdfTemplate,
+  },
     data(){
         return{
             employe:null,
             demandes:null,
             raisonPourChaqueDemande:null,
             showRaison:null,
+            NomPrenom: '',
+            dateDebut: null,
+            dateFin: null,
+            duree:null,
+            rest: null,
             currentPage: 1,
             totalPages: 1,
         }
@@ -109,28 +118,93 @@ export default {
                 this.fetchData();
                 }
         },
-        generatePDF(dem) {
-          var element = document.getElementById('temp');
-          var opt = {
-            margin:       1,
-            filename:     'myfile.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-          };
+        // async savePdf(){
+        //
+        //   const templateContainer = document.createElement('div');
+        //   const pdfTemplateComponent = this.$refs.pdfTemplate; // Reference to PdfTemplate component
+        //
+        //
+        //
+        //   // Append the template content to the container
+        //   templateContainer.innerHTML = pdfTemplateComponent.$el.innerHTML;
+        //
+        //   // Set options for html2pdf
+        //   const options = {
+        //     margin:       1,
+        //     filename:     'myfile.pdf',
+        //     image:        { type: 'jpeg', quality: 0.98 },
+        //     html2canvas:  { scale: 2 },
+        //     jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        //   };
+        //
+        //   // Generate the PDF
+        //   await html2pdf().set(options).from(templateContainer).save();
+        //
+        //
+        //
+        // }
+        // ,
+        async generatePDF(dem) {
+          // Create a temporary div to hold the template content
+          this.NomPrenom= this.employe.nom
+          this.dateDebut= this.localString(dem.dateDebut)
+          this.dateFin= this.localString(dem.dateFin)
+          this.duree= 4
+          this.rest= 16
 
-// New Promise-based usage:
-          html2pdf().set(opt).from(element).save();
 
-// Old monolithic-style usage:
-//           html2pdf(element, opt);
-
+            const templateContainer = document.createElement('div');
+            const pdfTemplateComponent = this.$refs.pdfTemplate; // Reference to PdfTemplate component
+          setTimeout(async function() {
 
 
 
 
+            // Append the template content to the container
+            templateContainer.innerHTML = pdfTemplateComponent.$el.innerHTML;
+
+            // Set options for html2pdf
+            const options = {
+              margin:       1,
+              filename:     'myfile.pdf',
+              image:        { type: 'jpeg', quality: 0.98 },
+              html2canvas:  { scale: 2 },
+              jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            // Generate the PDF
+            await html2pdf().set(options).from(templateContainer).save()}
 
 
+          , 1500)
+
+
+
+
+
+
+//////////////////////          2                 ////////////////////////
+//           var element = document.getElementById('temp');
+//           var opt = {
+//             margin:       1,
+//             filename:     'myfile.pdf',
+//             image:        { type: 'jpeg', quality: 0.98 },
+//             html2canvas:  { scale: 2 },
+//             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+//           };
+//
+// // New Promise-based usage:
+//           html2pdf().set(opt).from(element).save();
+//
+// // Old monolithic-style usage:
+// //           html2pdf(element, opt);
+//
+//
+
+
+
+
+/////////////                    1                  ////////////////////////////////////
           console.log(dem)
             // const pdf = new jsPDF();
             // const objetDemande = {
@@ -187,40 +261,49 @@ export default {
 </script>
 
 <template>
-  <div class="w-100 bg-white" id="temp">
-    <div class="row">
-      <div class="col-md-4">
-        <img src="../../assets/img/logo.png" alt="Company Logo" />
-      </div>
-    </div>
-    <div class="row mt-5">
-        <div class="col-md-4 offset-8">
-          <span class="fw-bold mt-3">Rabat le : {{ localString(new Date())}}</span>
-        </div>
-    </div>
-    <div class="row mt-5">
-      <h1 class="text-center"> Demande de congé annuel </h1>
-    </div>
-    <div class="row mt-10">
-      <h3 >Nom et Prénom : Saad Emp</h3>
-    </div>
-    <div class="row mt-5">
-      <h3 >Du (inclut) : ………18/01/2024……   Au (inclut) : ……19/01/2024……   </h3>
-    </div>
-    <div class="row mt-5">
-      <h3 >Durée du congé (en jours ouvrables) : ………{{ nbr }}...   </h3>
-    </div>
-    <div class="row mt-5">
-      <h3 >Reliquat du congé à la date de demande de congé : …… 100 …… jours</h3>
-    </div>
-    <div class="row mt-5">
-      <h3 >Le reste après cette demande :  16 jours </h3>
-    </div>
-    <div class="row mt-5">
-      <div class="col-3">Signature de l’intéressé : WebHi  </div>
-      <div class="col-3 offset-4"> Avis de la Direction :</div>
-    </div>
-  </div>
+  <pdf-template ref="pdfTemplate"
+                :NomPrenom="NomPrenom"
+                :dateDebut="dateDebut"
+                :dateFin= "dateFin"
+                :duree= 'duree'
+
+                :rest= 'rest'
+                style="display: none"
+  />
+<!--  <div class="w-100 bg-white" id="temp">-->
+<!--    <div class="row">-->
+<!--      <div class="col-md-4">-->
+<!--        <img src="../../assets/img/logo.png" alt="Company Logo" />-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="row mt-5">-->
+<!--        <div class="col-md-4 offset-8">-->
+<!--          <span class="fw-bold mt-3">Rabat le : {{ localString(new Date())}}</span>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="row mt-5">-->
+<!--      <h1 class="text-center"> Demande de congé annuel </h1>-->
+<!--    </div>-->
+<!--    <div class="row mt-10">-->
+<!--      <h3 >Nom et Prénom : Saad Emp</h3>-->
+<!--    </div>-->
+<!--    <div class="row mt-5">-->
+<!--      <h3 >Du (inclut) : ………18/01/2024……   Au (inclut) : ……19/01/2024……   </h3>-->
+<!--    </div>-->
+<!--    <div class="row mt-5">-->
+<!--      <h3 >Durée du congé (en jours ouvrables) : ………{{ nbr }}...   </h3>-->
+<!--    </div>-->
+<!--    <div class="row mt-5">-->
+<!--      <h3 >Reliquat du congé à la date de demande de congé : …… 100 …… jours</h3>-->
+<!--    </div>-->
+<!--    <div class="row mt-5">-->
+<!--      <h3 >Le reste après cette demande :  16 jours </h3>-->
+<!--    </div>-->
+<!--    <div class="row mt-5">-->
+<!--      <div class="col-3">Signature de l’intéressé : WebHi  </div>-->
+<!--      <div class="col-3 offset-4"> Avis de la Direction :</div>-->
+<!--    </div>-->
+<!--  </div>-->
 
 
 

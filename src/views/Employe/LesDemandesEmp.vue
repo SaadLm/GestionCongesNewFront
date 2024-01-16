@@ -14,17 +14,20 @@ export default {
   },
     data(){
         return{
-            employe:null,
-            demandes:null,
-            raisonPourChaqueDemande:null,
-            showRaison:null,
-            NomPrenom: '',
-            dateDebut: null,
-            dateFin: null,
-            duree:null,
-            rest: null,
-            currentPage: 1,
-            totalPages: 1,
+          employe:null,
+          demandes:null,
+          raisonPourChaqueDemande:null,
+          showRaison:null,
+          NomPrenom: '',
+          Fonction: '',
+          dateDebut: null,
+          dateFin: null,
+          duree:null,
+          rest: null,
+          numberOfDays:null,
+          currentPage: 1,
+          totalPages: 1,
+          emp:null
         }
     },
     methods:{
@@ -144,13 +147,74 @@ export default {
         //
         // }
         // ,
+      async getEmp(id){
+          const obj = {id_e:id}
+
+          axios.post('http://localhost:3000/emp',obj)
+              .then(response=>{
+                console.log(response.data)
+                this.emp=response.data.employeeData
+              })
+              .catch(err=>{
+                console.error(err)
+              })
+      },
+      async getSolde(id) {
+        // Assuming you have an employee ID
+        const employeeId = id;
+
+        try {
+          // Make an asynchronous request using async/await
+          const response = await axios.post('http://localhost:3000/getsolde', { id_e: employeeId });
+
+          // Extract the soldeConge value from the response
+          const soldeConge = response.data.solde[0].soldeConge;
+
+          // Assign the value to the Solde variable
+          this.Solde = soldeConge;
+
+          // If you want to return Solde, you can do that
+          return soldeConge;
+        } catch (error) {
+          // Handle errors here
+          console.error(error, "Error retrieving employee solde");
+          // Return a default value or handle the error as needed
+          return null;
+        }
+      },
+      async getNumberOfDays(debut,fin) {
+        try {
+          const response = await axios.get('http://localhost:3000/calculate-days', {
+            params: {
+              dateDebut: debut, // Replace with your start date
+              dateFin: fin,   // Replace with your end date
+            },
+          });
+
+          // Assign the response to the data variable
+          this.numberOfDays = response.data.numberOfDays;
+
+          // console.log(this.numberOfDays,' le nombre')
+
+        } catch (error) {
+          console.error('Error fetching number of days:', error);
+        }
+      },
         async generatePDF(dem) {
+
+          this.Fonction=''   // initialisation
+          await this.getEmp(dem.id_e)
           // Create a temporary div to hold the template content
-          this.NomPrenom= this.employe.nom
+          await this.getNumberOfDays(dem.dateDebut,dem.dateFin)
+          const solde = await this.getSolde(this.employe.id_e);
+
+
+          this.NomPrenom= this.employe.nom+' '+this.employe.prenom
           this.dateDebut= this.localString(dem.dateDebut)
           this.dateFin= this.localString(dem.dateFin)
-          this.duree= 4
-          this.rest= 16
+          this.duree= this.numberOfDays
+          this.rest= solde
+          this.Fonction = this.emp.fonction
 
 
             const templateContainer = document.createElement('div');
@@ -168,7 +232,7 @@ export default {
               margin:       1,
               filename:     'myfile.pdf',
               image:        { type: 'jpeg', quality: 0.98 },
-              html2canvas:  { scale: 2 },
+              html2canvas:  { scale: 1 },
               jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
 
@@ -266,7 +330,7 @@ export default {
                 :dateDebut="dateDebut"
                 :dateFin= "dateFin"
                 :duree= 'duree'
-
+                :Fonction="Fonction"
                 :rest= 'rest'
                 style="display: none"
   />
@@ -331,10 +395,10 @@ export default {
             <td>{{ dem.motif }} </td>
 <!--            <td v-if="this.$store.state.darkMode" :class="findEmpClass(dem.etat)" class="text-black fw-bolder">{{ dem.etat }} </td>-->
 <!--            <td v-if="!this.$store.state.darkMode" :class="findEmpClass(dem.etat)" class="text-black fw-bolder">{{ dem.etat }} </td>-->
-            <td :class="findEmpClass(dem.etat)" class="text-black fw-bolder">{{ dem.etat }} </td>
+            <td :class="findEmpClass(dem.etat)"  ><span class="text-dark fw-bolder">{{ dem.etat }} </span></td>
             <td @click="showInfoMessage(dem.raisonRefusion)" v-if="dem.raisonRefusion" class="btn" >voir le raison</td>
             <td @click="annuler(dem.id_co)" v-if="dem.etat==='En Attente'" ><span class="btn btn-danger">annuler</span></td>
-            <td @click="generatePDF(dem)" v-if="dem.etat==='Approuvé'" class="btn w-75"><i class="bi bi-file-earmark-pdf text-success fw-bold icon"></i></td>
+            <td @click="generatePDF(dem)" v-if="dem.etat==='Approuvé'" class="btn w-75"><i class="bi bi-file-earmark-pdf text-success fw-bold icon" title="Telechargé le pdf"></i></td>
 
         </tr>
 
@@ -345,9 +409,10 @@ export default {
     <div class="container-fluid ">
         <div class="row">
             <div class="col-md-4 offset-3">
-                <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square me-2"></i>Previous</button>
-                <span class="m-1">Page {{ currentPage }}</span>
-                <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages">Next<i class="bi bi-arrow-right-square ms-3"></i></button>
+                <span @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square me-2 m-1"></i>Previous</span>
+                <span :disabled="1==1" class="m-2 fw-bolder ">Page {{ currentPage }}</span>
+                <span @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages">Next<i class="bi bi-arrow-right-square ms-3"></i></span>
+
             </div>
         </div>
     </div>
@@ -356,6 +421,9 @@ export default {
 </template>
 
 <style scoped>
+.btn{
+  padding-bottom: 0px;
+}
 .showRaison{
     background-color: white;
     border: 1px solid black;

@@ -2,21 +2,35 @@
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
+import html2pdf from "html2pdf.js";
+import PdfTemplate from "@/views/Employe/PdfTemplate.vue";
+
 
 export default {
     data() {
         return {
-            demandes: null,
-            showMotif:false,
-            raisonRefusion:null,
-            idPourRefuser:null,
-            currentPage: 1,
-            totalPages: 1,
+          demandes: null,
+          showMotif:false,
+          raisonRefusion:null,
+          idPourRefuser:null,
+          currentPage: 1,
+          totalPages: 1,
           demPourRefuser:null,
           solde:0,
-          numberOfDays:0
+          numberOfDays:0,
+          NomPrenom: '',
+          dateDebut: null,
+          dateFin: null,
+          duree:null,
+          rest: null,
+          admin:null,
+          Fonction:null,
+          emp:null
         }
     },
+  components: {
+    PdfTemplate,
+  },
     methods:{
         localString(d){
             const formattedDate = moment(d).format('YYYY-MM-DD');
@@ -65,7 +79,18 @@ export default {
                 console.log("l'operation a ete annuler")
             }
         },
+      async getEmp(id){
+        const obj = {id_e:id}
 
+        axios.post('http://localhost:3000/emp',obj)
+            .then(response=>{
+              console.log(response.data)
+              this.emp=response.data.employeeData
+            })
+            .catch(err=>{
+              console.error(err)
+            })
+      },
       async getSolde(id) {
         // Assuming you have an employee ID
         const employeeId = id;
@@ -77,8 +102,7 @@ export default {
           // Extract the soldeConge value from the response
           const soldeConge = response.data.solde[0].soldeConge;
 
-          // Assign the value to the Solde variable
-          this.Solde = soldeConge;
+
 
           // If you want to return Solde, you can do that
           return soldeConge;
@@ -88,10 +112,11 @@ export default {
           // Return a default value or handle the error as needed
           return null;
         }
-      },
+      }
+      ,
       async getNumberOfDays(debut,fin) {
         try {
-          const response = await axios.get('/calculate-days', {
+          const response = await axios.get('http://localhost:3000/calculate-days', {
             params: {
               dateDebut: debut, // Replace with your start date
               dateFin: fin,   // Replace with your end date
@@ -100,30 +125,76 @@ export default {
 
           // Assign the response to the data variable
           this.numberOfDays = response.data.numberOfDays;
-          console.log('Number of days:', this.numberOfDays);
+
+          // console.log(this.numberOfDays,' le nombre')
+
         } catch (error) {
           console.error('Error fetching number of days:', error);
         }
-      }
-      ,
+      },
+      async generatePDF(dem) {
+
+        await this.getNumberOfDays(dem.dateDebut,dem.dateFin)
+        const solde = await this.getSolde(dem.id_e);
+        this.Fonction=''   // initialisation
+        await this.getEmp(dem.id_e)
+
+        this.NomPrenom= dem.nom
+        this.dateDebut= this.localString(dem.dateDebut)
+        this.dateFin= this.localString(dem.dateFin)
+        this.duree= this.numberOfDays
+        this.rest= solde
+        this.admin=1
+        this.Fonction = this.emp.fonction
+
+
+        const templateContainer = document.createElement('div');
+        const pdfTemplateComponent = this.$refs.pdfTemplate; // Reference to PdfTemplate component
+        setTimeout(async function() {
+
+
+
+
+
+              templateContainer.innerHTML = pdfTemplateComponent.$el.innerHTML;
+
+
+              const options = {
+                margin:       1,
+                filename:     'myfile.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+              };
+
+              // Generate the PDF
+              await html2pdf().set(options).from(templateContainer).save()}
+
+
+            , 1500)
+
+
+        console.log(dem)
+      },
       async accepterConge(demande) {
         try {
-          // Get the solde value using getSolde
+
           const solde = await this.getSolde(demande.id_e);
 
-          // Make the request to accept the leave
+
           const response = await axios.put('http://localhost:3000/accepterconge', demande);
 
           console.log('Le congé a été accepté');
-          console.log(response.data);
-          this.getNumberOfDays(demande.dateDebut,demande.dateFin)
-          // Construct the email message
+
+          await this.getNumberOfDays(demande.dateDebut,demande.dateFin)
+
+
           const messageEmail = {
             objet:'Acceptation de votre demande de congé',
             to: response.data.employeeData.email,
             message: `Bonjour,
             Nous sommes ravis de vous informer que votre demande de congé pour la période du ${this.localString(demande.dateDebut)} au ${this.localString(demande.dateFin)} a été acceptée.
-            Vous bénéficiez d'une durée de ${this.numberOfDays} jours de congé, et votre reliquat après cette demande est de ${solde} jours.
+            Vous bénéficiez d'une durée de ${this.numberOfDays} jours de congé, et votre reliquat après cette demande est de ${solde-this.numberOfDays} jours.
             Cordialement.`,
           };
 
@@ -177,8 +248,10 @@ export default {
             // console.log(raisonRefusion)
           const demande ={
               id_co: id_co,
-            raisonRefusion: raisonRefusion,
-            id_e:dem.id_e,
+              dateDebut:this.demPourRefuser.dateDebut,
+              dateFin:this.demPourRefuser.dateFin,
+              raisonRefusion: raisonRefusion,
+              id_e:dem.id_e,
           }
 
             axios.put('http://localhost:3000/refuserconge',demande)
@@ -188,13 +261,16 @@ export default {
                   const messageEmail = {
                     objet:'Réponse à votre demande de congé',
                     to : response.data.employeeData.email,
-                    message:`Bonjour,
-                    Nous avons pris connaissance de votre demande de congé pour la période du ${this.localString(demande.dateDebut)} au ${this.localString(demande.dateFin)} . Après avoir examiné attentivement la situation actuelle de l'équipe et les impératifs opérationnels, nous regrettons de vous informer que votre demande de congé n'a pas été approuvée.
-                    Nous restons ouverts à la discussion et à l'exploration de solutions alternatives si vous avez des préoccupations ou des questions. Merci de votre compréhension.
+                    message:`
+                    Bonjour,
+                    Nous avons pris connaissance de votre demande de congé pour la période du ${this.localString(demande.dateDebut)} au ${this.localString(demande.dateFin)} .
+                    Après avoir examiné attentivement la situation actuelle de l'équipe et les impératifs opérationnels, nous regrettons de vous informer que votre demande de congé n'a pas été approuvée.
+                    Nous restons ouverts à la discussion et à l'exploration de solutions alternatives si vous avez des préoccupations ou des questions.
+                    Merci de votre compréhension.
                     Cordialement.
 
-                    Motif : ${demande.raisonRefusion}
                     `
+                    // Motif : ${demande.raisonRefusion}
                   }
                   this.sendEmail(messageEmail)
                   this.fetchData()
@@ -273,6 +349,17 @@ export default {
 </script>
 
 <template>
+  <pdf-template ref="pdfTemplate"
+                :NomPrenom="NomPrenom"
+                :dateDebut="dateDebut"
+                :dateFin= "dateFin"
+                :duree= 'duree'
+                :rest= 'rest'
+                :admin="admin"
+                :Fonction="emp.fonction"
+
+                style="display: none"
+  />
     <div v-if="showMotif" class="container-fluid position-absolute showMotif w-50  h-25">
         <span class="text-danger fw-bolder">Raison de refusion :</span>
         <textarea class="w-100 h-75" v-model="raisonRefusion"></textarea>
@@ -282,11 +369,11 @@ export default {
 
         </div>
     </div>
-    <table class="table table-rounded mt-5 table-flush w-75">
+    <table class="table table-rounded mt-5 table-flush w-65">
 
         <thead>
-        <tr class="fw-bold fs-7 text-danger border-bottom border-gray-200 py-4 text-primary">
-            <th>Nom d'employé :</th>
+        <tr class="fw-bold fs-7 border-bottom border-gray-200 text-primary text-center">
+            <th>Nom  :</th>
             <th>Date de demande :</th>
             <th>Date de debut :</th>
             <th>Date de fin :</th>
@@ -296,14 +383,18 @@ export default {
         </tr>
         </thead>
         <tbody class="fw-bold">
-        <tr v-for="dem in demandes" :key="dem.id_co">
-            <td>{{ dem.nom }}</td>
-            <td>{{ localString(dem.dateAc) }}</td>
-            <td>{{localString(dem.dateDebut) }}</td>
+        <tr v-for="dem in demandes" :key="dem.id_co" class="text-center">
+            <td style="width: 10%">{{ dem.nom }}</td>
+            <td style="width: 10%">{{ localString(dem.dateAc) }}</td>
+            <td style="width: 10%">{{localString(dem.dateDebut) }}</td>
             <td>{{localString(dem.dateFin) }} </td>
             <td>{{ dem.motif }} </td>
             <td v-if="dem.etat ==='En Attente'" class="tdd" ><i @click="showConfirmationAccepter(dem)" class="bi btn bi-check2-square ms-5 text-white bg-success"></i><i @click="Motif(dem)" class="bi btn bi-slash-circle text-white bg-danger"></i></td>
-            <td v-if="dem.etat !=='En Attente'" class="tdd"  :class="findEmpClass(dem.etat)" >{{ dem.etat }} <i v-if="dem.etat==='Refusé'" class="bi bi-question-square cursor-pointer icon ms-5" @click="showInfoMessage(dem.raisonRefusion)"></i>   </td>
+            <td v-if="dem.etat !=='En Attente'" class="tdd"  :class="findEmpClass(dem.etat)" >
+              {{ dem.etat }}
+              <i v-if="dem.etat==='Refusé'" class="bi bi-question-square cursor-pointer icon ms-5" @click="showInfoMessage(dem.raisonRefusion)"></i>
+              <i v-if="dem.etat==='Approuvé'" class="bi bi-file-earmark-pdf text-dark fw-bold icon ms-4" @click="generatePDF(dem)" title="Telechargé le pdf"></i>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -311,9 +402,9 @@ export default {
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-4 offset-3">
-                <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square me-2"></i>Previous</button>
-                <span class="m-1">Page {{ currentPage }}</span>
-                <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages">Next<i class="bi bi-arrow-right-square ms-3"></i></button>
+                <button @click="prevPage" class="btn pb-0" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square me-2"></i>Previous</button>
+                <span class="m-2 fw-bolder ">Page {{ currentPage }}</span>
+                <button @click.prevent="nextPage" class="btn pb-0" :disabled="currentPage === totalPages">Next<i class="bi bi-arrow-right-square ms-3"></i></button>
             </div>
         </div>
     </div>
@@ -342,6 +433,12 @@ export default {
 </template>
 
 <style scoped>
+.btn {
+  margin-bottom: 1rem;
+  letter-spacing: -0.025rem;
+  text-transform: none;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.1), 0px 0px 0px 0px rgba(0, 0, 0, 0.08);
+}
 .showMotif{
     background-color: white;
     top: 40%;

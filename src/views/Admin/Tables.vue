@@ -23,7 +23,8 @@ export default {
               dateRecrutement:null,
               cin:null,
               typeContrat:null,
-              cnss:null
+              cnss:null,
+              fonction:null
           },
             typeContrat: null,
             err:null,
@@ -57,15 +58,31 @@ export default {
 
 
 
-            if (this.employeData.nom == null ||
+            if (
+                this.employeData.nom == null ||
+                this.employeData.nom == '' ||
                 this.employeData.prenom == null ||
+                this.employeData.prenom == "" ||
                 this.employeData.status == null ||
+                this.employeData.status == '' ||
                 this.employeData.tel == null ||
+                this.employeData.tel == '' ||
+                this.employeData.email == null ||
+                this.employeData.email == '' ||
+                this.employeData.pass == null ||
+                this.employeData.pass == '' ||
                 this.employeData.adresse == null ||
+                this.employeData.adresse == '' ||
+                this.employeData.typeContrat == 0 ||
                 this.employeData.typeContrat == null ||
                 this.employeData.dateRecrutement == null ||
                 this.employeData.cin == null ||
-                this.employeData.cnss == null
+                this.employeData.cin == '' ||
+                this.employeData.cnss == null||
+                this.employeData.cnss == ''||
+                this.employeData.fonction == null||
+                this.employeData.fonction == ''
+
                 )
             {
                 this.err = 'Merci de remplir les champs';
@@ -123,17 +140,29 @@ export default {
         modifierEmploye(){
 
 
-            if (this.employeData.nom == null ||
+            if (
+                this.employeData.nom == null ||
+                this.employeData.nom == '' ||
                 this.employeData.prenom == null ||
+                this.employeData.prenom == "" ||
                 this.employeData.status == null ||
+                this.employeData.status == '' ||
                 this.employeData.tel == null ||
+                this.employeData.tel == '' ||
                 this.employeData.email == null ||
+                this.employeData.email == '' ||
                 // this.employeData.pass === '' ||
                 this.employeData.adresse == null ||
+                this.employeData.adresse == '' ||
                 this.employeData.typeContrat == 0 ||
+                this.employeData.typeContrat == null ||
                 this.employeData.dateRecrutement == null ||
                 this.employeData.cin == null ||
-                this.employeData.cnss == null
+                this.employeData.cin == '' ||
+                this.employeData.cnss == null||
+                this.employeData.cnss == ''||
+                this.employeData.fonction == null||
+                this.employeData.fonction == ''
             )
             {
                 this.errModifier = 'Merci de remplir les champs';
@@ -230,6 +259,7 @@ export default {
                 const response = await axios.post(`http://localhost:3000/employepage`, obj);
                 const data = response.data;
                 console.log("hada total : ", data.total)
+                console.log("hadi page : ", this.currentPage)
                 // Assuming the total count is sent from the server
                 this.totalPages = Math.ceil(data.total / 10);
                 // console.log('totalPages = ',this.totalPages)
@@ -363,12 +393,19 @@ export default {
                         </div>
                         <div class="row">
 
-                            <div class="col-md-6 offset-md-3 mb-4">
+                            <div class="col-md-6  mb-4">
                                 <div class="form-outline">
                                     <input v-model="employeData.cnss" type="text" class="form-control form-control-lg" />
-                                    <label class="form-label" for="login">Numero CNSS :</label>
+                                    <label class="form-label" >Numero CNSS :</label>
                                 </div>
                             </div>
+                          <div class="col-md-6  mb-4">
+                                <div class="form-outline">
+                                    <input v-model="employeData.fonction" type="text" class="form-control form-control-lg" />
+                                    <label class="form-label" >Fonction  :</label>
+                                </div>
+                            </div>
+
                         </div>
                     <span class="text-danger fw-bolder">{{err}}</span>
 
@@ -477,12 +514,21 @@ export default {
                         </div>
                         <div class="row">
 
-                            <div class="col-md-6 offset-md-3 mb-4">
+                            <div class="col-md-6 mb-4">
                                 <div class="form-outline">
                                     <input v-model="employeData.cnss" type="text" class="form-control form-control-lg" />
                                     <label class="form-label" for="login">Numero CNSS :</label>
                                 </div>
                             </div>
+                          <div class="col-md-6  mb-4">
+                            <div class="form-outline">
+                              <input v-model="employeData.fonction" type="text" class="form-control form-control-lg" />
+                              <label class="form-label" >Fonction  :</label>
+                            </div>
+                          </div>
+
+
+
                         </div>
                         <span class="text-danger fw-bolder">{{errModifier}}</span>
                         <div class="row w-100">
@@ -548,19 +594,19 @@ export default {
     </div>
 </div>
 
-]
 <!--  <div class="position-fixed fixed-bottom w-100">-->
-  <div class="position-fixed w-100" >
+<!--  <div class="position-fixed w-100" >-->
     <div class="container-fluid">
       <div class="row" >
             <div class="col-md-5 offset-md-5 col-sm-10 offset-sm-1" >
-                <button @click="prevPage" class="btn" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square"></i>Previous</button>
-                <span>Page {{ currentPage }}</span>
-                <button @click.prevent="nextPage" class="btn" :disabled="currentPage === totalPages"><i class="bi bi-arrow-right-square"></i>Next</button>
+                <button @click="prevPage" class="btn pb-0" :disabled="currentPage === 1"><i class="bi bi-arrow-left-square"></i>Previous</button>
+<!--                <span>Page {{ currentPage }}</span>-->
+              <span class="m-2 fw-bolder ">Page {{ currentPage }}</span>
+                <button @click.prevent="nextPage" class="btn pb-0" :disabled="currentPage === totalPages"><i class="bi bi-arrow-right-square"></i>Next</button>
             </div>
           </div>
       </div>
-    </div>
+<!--    </div>-->
 
 </template>
 

@@ -13,26 +13,50 @@
         </div>
       </div>
       <div class="row mt-5">
-        <h1 class="text-center"> Demande de congé annuel </h1>
-      </div>
-      <div class="row mt-10">
-        <h3 >Nom et Prénom : {{ NomPrenom }}</h3>
+        <h1 class="text-center" style="font-weight: bolder;font-size: 20px"> Demande de congé annuel </h1>
       </div>
       <div class="row mt-5">
-        <h3 >Du (inclut) : ………{{ dateDebut }}……   Au (inclut) : ……{{ dateFin }}……   </h3>
+        <h3 >Nom et Prénom :  {{ NomPrenom }}</h3>
       </div>
-      <div class="row mt-5">
-        <h3 >Durée du congé (en jours ouvrables) : ……… {{ duree }}...   </h3>
+      <div class="row mt-2">
+        <h3 >Fonction :   {{ Fonction }}</h3>
       </div>
-<!--      <div class="row mt-5">-->
+      <div class="row mt-2">
+        <div class="col-4"><span class="fw-bold">Du (inclut) :  {{ dateDebut }} </span></div>
+        <div class="col-4 offset-2"><span> Au (inclut) :  {{ dateFin }} </span></div>
+      </div>
+      <div class="row mt-2">
+        <h3 >Durée du congé (en jours ouvrables) :  {{ duree }}    </h3>
+      </div>
+<!--      <div class="row mt-2">-->
 <!--        <h3 >Reliquat du congé à la date de demande de congé : …… 100 …… jours</h3>-->
 <!--      </div>-->
-      <div class="row mt-5">
+      <div class="row mt-2">
         <h3 >Le reste après cette demande :  {{rest}} jours </h3>
       </div>
       <div class="row mt-5">
-        <div class="col-3">Signature de l’intéressé : WebHi  </div>
-        <div class="col-3 offset-4"> Avis de la Direction :</div>
+        <div v-if="admin!=1" class="col-3">Signature de l’intéressé : <br><span style="font-style: italic;font-weight: bold"> {{NomPrenom}} </span>  </div>
+        <div v-if="admin!=1" class="col-3 offset-4"> Avis de la Direction :</div>
+        <div v-if="admin==1" class="col-3 offset-7"> Avis de la Direction :</div>
+      </div>
+      <div class="row mt-2">
+        <div  class="col-3 offset-7" style="font-weight: bold">Avis favorable</div>
+<!--        <div v-if="admin!=1" class="col-3 offset-7" style="font-weight: bold">Avis favorable</div>-->
+<!--        <div v-if="admin==1" class="col-3 offset-7" style="font-weight: bold">Avis favorable</div>-->
+      </div>
+      <div class="container-fluid mt-12 w-100">
+        <div class="row w-75 offset-1 h-2 ">
+          <hr class="bg-primary ms-3">
+        </div>
+
+            <div class="text-primary "  style="font-size: 8px;width:95%;margin: auto">
+              WEBHI TECHNOLOGY SARL | Adresse : Apt 14, rue Siam 32 avenue Madagascar Rabat, Maroc | IF : 18746829 | RC : 116145
+            </div>
+            <div class="text-primary" style="font-size: 8px;width:98%;margin: auto">
+            ICE : 001551589000039 | CNSS : 4784270 | Téléphone : +212 537 70 70 27 | Emai l: contact@webhi.com | Site web : www.webhi.com
+            </div>
+
+
       </div>
     </div>
 </template>
@@ -43,6 +67,7 @@ import moment from "moment";
 export default {
   props: {
     NomPrenom: String,
+    Fonction: String,
     dateDebut: String,
     dateFin: String,
     duree: {
@@ -54,6 +79,11 @@ export default {
       required: true,
 
     },
+    admin: {
+      type: Number,
+      required: true,
+
+    }
     // Add other props as needed
   },
 

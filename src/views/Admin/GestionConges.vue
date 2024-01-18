@@ -86,6 +86,7 @@ export default {
             .then(response=>{
               console.log(response.data)
               this.emp=response.data.employeeData
+              this.Fonction= this.emp.fonction
             })
             .catch(err=>{
               console.error(err)
@@ -356,7 +357,7 @@ export default {
                 :duree= 'duree'
                 :rest= 'rest'
                 :admin="admin"
-                :Fonction="emp.fonction"
+                :Fonction="Fonction"
 
                 style="display: none"
   />
